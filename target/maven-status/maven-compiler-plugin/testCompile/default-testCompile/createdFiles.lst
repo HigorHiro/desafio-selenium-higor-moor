@@ -1,0 +1,7 @@
+br\com\petshop\pages\LoginPage.class
+br\com\petshop\tests\HomeTest.class
+br\com\petshop\pages\HomePage.class
+br\com\petshop\base\BaseTest.class
+br\com\petshop\tests\LoginTest.class
+br\com\petshop\pages\RegisterPage.class
+br\com\petshop\tests\RegisterTest.class
