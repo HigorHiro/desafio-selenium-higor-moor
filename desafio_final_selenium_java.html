@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PetShop QA Center | Autenticação obrigatória</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: linear-gradient(135deg, #eef4ff, #f8fbff);
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(90deg, #2563eb, #1d4ed8);
+      color: white;
+      padding: 18px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      letter-spacing: -0.3px;
+    }
+
+    nav {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    nav button {
+      border: none;
+      padding: 8px 18px;
+      border-radius: 40px;
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.2s;
+      backdrop-filter: blur(2px);
+    }
+
+    nav button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(0.97);
+    }
+
+    #user-status {
+      background: #0f2b5e;
+      padding: 6px 16px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-left: 12px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .page {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card {
+      background: white;
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+      margin-bottom: 30px;
+      transition: 0.2s;
+    }
+
+    .title {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: #475569;
+      margin-bottom: 24px;
+      border-left: 4px solid #2563eb;
+      padding-left: 14px;
+    }
+
+    .login-wrapper {
+      max-width: 480px;
+      margin: 40px auto;
+    }
+
+    .login-banner {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .login-banner img {
+      width: 105px;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 12px 16px;
+      font-size: 15px;
+      transition: 0.2s;
+      background-color: #ffffff;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .button {
+      border: none;
+      border-radius: 40px;
+      padding: 12px 28px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .primary-button {
+      background: #2563eb;
+      color: white;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+    }
+
+    .primary-button:hover {
+      background: #1e40af;
+      transform: translateY(-2px);
+    }
+
+    .secondary-button {
+      background: #eef2ff;
+      color: #1e293b;
+    }
+
+    .secondary-button:hover {
+      background: #e0e7ff;
+    }
+
+    .danger-button {
+      background: #dc2626;
+      color: white;
+    }
+
+    .danger-button:hover {
+      background: #b91c1c;
+    }
+
+    .success-message {
+      margin-top: 18px;
+      background: #dcfce7;
+      border-left: 5px solid #22c55e;
+      color: #166534;
+      padding: 12px 18px;
+      border-radius: 16px;
+      display: none;
+      font-weight: 500;
+    }
+
+    .error-message {
+      margin-top: 18px;
+      background: #fee2e2;
+      border-left: 5px solid #ef4444;
+      color: #991b1b;
+      padding: 12px 18px;
+      border-radius: 16px;
+      display: none;
+      font-weight: 500;
+    }
+
+    .info-message {
+      margin-top: 18px;
+      background: #e6f0ff;
+      border-left: 5px solid #3b82f6;
+      color: #1e3a8a;
+      padding: 12px 18px;
+      border-radius: 16px;
+      display: none;
+      font-weight: 500;
+    }
+
+    .dashboard-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 22px;
+      margin: 25px 0 15px;
+    }
+
+    .dashboard-card {
+      background: #ffffff;
+      border: 1px solid #e0edff;
+      border-radius: 24px;
+      padding: 22px;
+      transition: 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    .dashboard-card:hover {
+      border-color: #90b4f5;
+      background: #fefefe;
+    }
+
+    .dashboard-card h3 {
+      margin-bottom: 12px;
+      color: #1e3a8a;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 18px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    th {
+      background: #2563eb;
+      color: white;
+      padding: 14px 16px;
+      text-align: left;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #e9f0fc;
+    }
+
+    tr:nth-child(even) {
+      background-color: #fafdff;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .checkbox-wrapper input {
+      width: 20px;
+      height: 20px;
+      margin: 0;
+    }
+
+    .checkbox-wrapper label {
+      margin: 0;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      padding: 28px;
+      color: #5b6e8c;
+      font-size: 13px;
+      border-top: 1px solid #e2edff;
+    }
+
+    @media (max-width: 640px) {
+      header {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+      }
+      .card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🐾 PetShop QA Center</h1>
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <nav>
+      <button id="nav-login" onclick="navigateTo('login-page')">🔐 Login</button>
+      <button id="nav-home" onclick="navigateTo('home-page')">🏠 Home</button>
+      <button id="nav-register" onclick="navigateTo('register-page')">📝 Cadastro</button>
+    </nav>
+    <span id="user-status"></span>
+  </div>
+</header>
+
+<div class="container">
+  <!-- PÁGINA DE LOGIN -->
+  <section id="login-page" class="page active">
+    <div class="card login-wrapper">
+      <div class="login-banner">
+        <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="logo petshop">
+        <h2 class="title">🐕 Acesso ao Sistema</h2>
+        <p class="subtitle">Automação Selenium + Java | Ambiente treinamento</p>
+      </div>
+
+      <div id="login-global-error" class="error-message" style="margin-bottom: 10px;"></div>
+
+      <div class="form-group">
+        <label for="login-username">👤 Usuário</label>
+        <input type="text" id="login-username" placeholder="admin" autocomplete="off">
+      </div>
+
+      <div class="form-group">
+        <label for="login-password">🔒 Senha</label>
+        <input type="password" id="login-password" placeholder="123456">
+      </div>
+
+      <button id="login-submit" class="button primary-button" style="width: 100%;" onclick="doLogin()">
+        Entrar no sistema
+      </button>
+
+      <div id="login-success" class="success-message">✅ Login realizado! Redirecionando...</div>
+      <div id="login-error" class="error-message">❌ Usuário ou senha inválidos. Use admin / 123456</div>
+    </div>
+  </section>
+
+  <!-- HOME PAGE (protegida) -->
+  <section id="home-page" class="page">
+    <div class="card">
+      <h2 class="title">📊 Dashboard do PetShop</h2>
+      <p class="subtitle">Serviços e indicadores para automação de testes</p>
+
+      <div class="dashboard-cards">
+        <div class="dashboard-card" id="card-bath"><h3>🛁 Banho & Tosa</h3><p>Profissionais especializados</p></div>
+        <div class="dashboard-card" id="card-vet"><h3>🩺 Veterinário 24h</h3><p>Consultas, vacinas, emergências</p></div>
+        <div class="dashboard-card" id="card-products"><h3>📦 Produtos</h3><p>Rações, brinquedos e acessórios</p></div>
+        <div class="dashboard-card" id="card-delivery"><h3>🚚 Delivery</h3><p>Entrega para toda cidade</p></div>
+      </div>
+
+      <div class="actions">
+        <button id="promotion-button" class="button primary-button" onclick="showPromotion()">🎁 Ver promoção</button>
+        <button id="open-register-page" class="button secondary-button" onclick="navigateTo('register-page')">➕ Cadastrar Pet</button>
+        <button id="logout-button" class="button danger-button" onclick="logout()">🚪 Sair</button>
+      </div>
+
+      <div id="promotion-message" class="success-message">🎉 Promoção especial: banho completo com 20% OFF + brinde!</div>
+    </div>
+
+    <div class="card">
+      <h2 class="title">📋 Tabela de Serviços</h2>
+      <table id="services-table">
+        <thead><tr><th>Serviço</th><th>Duração</th><th>Preço</th></tr></thead>
+        <tbody>
+          <tr><td>Banho tradicional</td><td>45 min</td><td>R$ 50,00</td></tr>
+          <tr><td>Tosa higiênica</td><td>1 hora</td><td>R$ 80,00</td></tr>
+          <tr><td>Consulta veterinária</td><td>30 min</td><td>R$ 120,00</td></tr>
+          <tr><td>Pacote banho + tosa</td><td>1h30</td><td>R$ 115,00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CADASTRO PAGE (protegida) -->
+  <section id="register-page" class="page">
+    <div class="card">
+      <h2 class="title">🐶 Cadastro de Pets</h2>
+      <p class="subtitle">Formulário para praticar interações com Selenium</p>
+
+      <form id="pet-form">
+        <div class="row">
+          <div class="form-group">
+            <label for="pet-name">🐕 Nome do Pet *</label>
+            <input type="text" id="pet-name" placeholder="Ex: Thor, Luna">
+          </div>
+          <div class="form-group">
+            <label for="pet-owner">👤 Nome do Dono *</label>
+            <input type="text" id="pet-owner" placeholder="Nome completo">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group">
+            <label for="pet-species">🐾 Espécie *</label>
+            <select id="pet-species">
+              <option value="">Selecione</option>
+              <option value="Cachorro">Cachorro 🐕</option>
+              <option value="Gato">Gato 🐈</option>
+              <option value="Ave">Ave 🦜</option>
+              <option value="Roedor">Roedor 🐹</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="pet-age">📅 Idade (texto livre)</label>
+            <input type="text" id="pet-age" placeholder="Ex: 5 anos, 24 meses, 3 anos e meio">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="pet-notes">📝 Observações clínicas</label>
+          <textarea id="pet-notes" rows="3" placeholder="Alergias, comportamento, medicamentos..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="pet-vaccinated">
+            <label for="pet-vaccinated">✅ Vacinação em dia</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="pet-photo">📸 Foto do Pet (simulação upload)</label>
+          <input type="file" id="pet-photo" accept="image/*">
+        </div>
+
+        <div class="actions">
+          <button type="button" id="save-pet-button" class="button primary-button" onclick="savePet()">💾 Salvar Cadastro</button>
+          <button type="reset" id="clear-form-button" class="button secondary-button">🧹 Limpar campos</button>
+        </div>
+      </form>
+
+      <div id="pet-success" class="success-message">✅ Pet cadastrado com sucesso!</div>
+    </div>
+
+    <div class="card">
+      <h2 class="title">📋 Pets Cadastrados</h2>
+      <table id="pets-table">
+        <thead>
+          <tr><th>Nome</th><th>Dono</th><th>Espécie</th><th>Idade</th><th>Vacinado</th></tr>
+        </thead>
+        <tbody id="pets-table-body">
+          <tr><td>Rex</td><td>Carlos</td><td>Cachorro</td><td>5 anos</td><td>Sim</td></tr>
+          <tr><td>Mia</td><td>Fernanda</td><td>Gato</td><td>2 anos</td><td>Sim</td></tr>
+          <tr><td>Pipoca</td><td>Juliana</td><td>Ave</td><td>1 ano</td><td>Não</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<footer>
+  🧪 Projeto treinamento Selenium WebDriver + Java | Autenticação obrigatória | Login indisponível após logado
+</footer>
+
+<script>
+  // CONTROLE DE AUTENTICAÇÃO
+  let loggedIn = false;
+  const userStatusSpan = document.getElementById('user-status');
+
+  function updateUserStatus() {
+    if (loggedIn) {
+      userStatusSpan.innerHTML = '✅ Admin logado';
+      userStatusSpan.style.background = '#0e3b2c';
+      userStatusSpan.style.padding = '5px 12px';
+      userStatusSpan.style.borderRadius = '30px';
+    } else {
+      userStatusSpan.innerHTML = '🔒 Deslogado';
+      userStatusSpan.style.background = '#4a2f2f';
+    }
+  }
+
+  function showLoginRequiredMessage() {
+    const errorDiv = document.getElementById('login-global-error');
+    if (errorDiv && !loggedIn) {
+      errorDiv.innerText = '⚠️ É necessário estar logado para acessar esta página. Faça login.';
+      errorDiv.style.display = 'block';
+      setTimeout(() => { errorDiv.style.display = 'none'; }, 4500);
+    }
+    showPageDirect('login-page');
+  }
+
+  // Navegação com regra: se estiver logado, NÃO pode ir para login-page
+  function navigateTo(pageId) {
+    // Bloqueia acesso à tela de login quando já está logado
+    if (pageId === 'login-page' && loggedIn) {
+      // Exibe mensagem amigável e redireciona para Home
+      const infoMsg = document.createElement('div');
+      infoMsg.className = 'info-message';
+      infoMsg.innerText = 'ℹ️ Você já está logado. Para fazer login novamente, primeiro use "Sair".';
+      infoMsg.style.display = 'block';
+      const container = document.querySelector('.container');
+      const existing = document.querySelector('.info-message');
+      if (existing) existing.remove();
+      container.prepend(infoMsg);
+      setTimeout(() => infoMsg.remove(), 3500);
+      // Redireciona para home se estiver logado
+      if (loggedIn) {
+        showPageDirect('home-page');
+      }
+      return;
+    }
+
+    const publicPages = ['login-page'];
+    if (!publicPages.includes(pageId) && !loggedIn) {
+      showLoginRequiredMessage();
+      return;
+    }
+    showPageDirect(pageId);
+  }
+
+  function showPageDirect(pageId) {
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(pageId);
+    if (target) target.classList.add('active');
+  }
+
+  // LOGIN
+  function doLogin() {
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+    const successDiv = document.getElementById('login-success');
+    const errorDiv = document.getElementById('login-error');
+    const globalErr = document.getElementById('login-global-error');
+
+    successDiv.style.display = 'none';
+    errorDiv.style.display = 'none';
+    if (globalErr) globalErr.style.display = 'none';
+
+    if (username === 'admin' && password === '123456') {
+      loggedIn = true;
+      updateUserStatus();
+      successDiv.style.display = 'block';
+      setTimeout(() => {
+        navigateTo('home-page');
+        document.getElementById('login-username').value = '';
+        document.getElementById('login-password').value = '';
+        successDiv.style.display = 'none';
+      }, 700);
+    } else {
+      errorDiv.style.display = 'block';
+      loggedIn = false;
+      updateUserStatus();
+    }
+  }
+
+  // LOGOUT
+  function logout() {
+    loggedIn = false;
+    updateUserStatus();
+    document.getElementById('promotion-message').style.display = 'none';
+    document.getElementById('pet-success').style.display = 'none';
+    if (document.getElementById('pet-form')) document.getElementById('pet-form').reset();
+    // Força exibição da página de login (agora permitida pois loggedIn = false)
+    showPageDirect('login-page');
+    // limpa mensagens de erro da home/cadastro
+    const infoMsg = document.querySelector('.info-message');
+    if (infoMsg) infoMsg.remove();
+  }
+
+  // PROMOÇÃO (apenas logado)
+  function showPromotion() {
+    if (!loggedIn) {
+      showLoginRequiredMessage();
+      return;
+    }
+    const promoDiv = document.getElementById('promotion-message');
+    promoDiv.style.display = 'block';
+    setTimeout(() => { if (promoDiv) promoDiv.style.display = 'none'; }, 5000);
+    alert('🎁 Promoção liberada: 20% OFF em banho completo!');
+  }
+
+  // SALVAR PET (idade como texto livre)
+  function savePet() {
+    if (!loggedIn) {
+      showLoginRequiredMessage();
+      return;
+    }
+
+    const name = document.getElementById('pet-name').value.trim();
+    const owner = document.getElementById('pet-owner').value.trim();
+    const species = document.getElementById('pet-species').value;
+    const age = document.getElementById('pet-age').value.trim();
+    const vaccinated = document.getElementById('pet-vaccinated').checked ? 'Sim' : 'Não';
+
+    if (!name || !owner || !species) {
+      alert('⚠️ Preencha: Nome do Pet, Dono e Espécie (obrigatórios).');
+      return;
+    }
+
+    const tbody = document.getElementById('pets-table-body');
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+      <td>${escapeHtml(name)}</td>
+      <td>${escapeHtml(owner)}</td>
+      <td>${escapeHtml(species)}</td>
+      <td>${age ? escapeHtml(age) : '—'}</td>
+      <td>${vaccinated}</td>
+    `;
+    tbody.appendChild(newRow);
+
+    const successDiv = document.getElementById('pet-success');
+    successDiv.style.display = 'block';
+    setTimeout(() => { successDiv.style.display = 'none'; }, 3000);
+
+    document.getElementById('pet-form').reset();
+    document.getElementById('pet-vaccinated').checked = false;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  // INICIALIZAÇÃO
+  window.addEventListener('DOMContentLoaded', () => {
+    loggedIn = false;
+    updateUserStatus();
+    showPageDirect('login-page');
+    document.getElementById('login-success').style.display = 'none';
+    document.getElementById('login-error').style.display = 'none';
+    document.getElementById('pet-success').style.display = 'none';
+    document.getElementById('promotion-message').style.display = 'none';
+    if (document.getElementById('login-global-error')) {
+      document.getElementById('login-global-error').style.display = 'none';
+    }
+  });
+</script>
+</body>
+</html>
